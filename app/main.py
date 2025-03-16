@@ -11,5 +11,5 @@ app.include_router(router)
 
 
 @app.get("/")
-def index():
+def home():
     return {"message": "Bienvenido al Analizador de Lotería"}

@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    command: sh -c "uvicorn analizer.main:app --reload --port=8000 --host=0.0.0.0"
+    command: sh -c "uvicorn app.main:app --reload --port=8000 --host=0.0.0.0 >> /app/logs/app.log 2>&1"
     restart: unless-stopped
     env_file:
       - .env
@@ -9,3 +9,4 @@ services:
       - "${PORT}:8000"
     volumes:
       - .:/app
+      - ./logs:/app/logs  # Montamos la carpeta de logs en el host

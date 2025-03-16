@@ -1,0 +1,11 @@
+services:
+  web:
+    build: .
+    command: sh -c "uvicorn analizer.main:app --reload --port=8000 --host=0.0.0.0"
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:8000"
+    volumes:
+      - .:/app

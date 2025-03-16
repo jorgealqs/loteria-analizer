@@ -6,6 +6,8 @@ COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY analizer /app
+ENV PYTHONPATH=/app
 
-CMD ["uvicorn", "analizer.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+COPY app /app
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

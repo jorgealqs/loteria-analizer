@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from app.routes.endpoints import router
 
 app = FastAPI(
@@ -12,4 +12,4 @@ app.include_router(router)
 
 @app.get("/")
 def home():
-    return {"message": "Bienvenido al Analizador de Lotería"}
+    return Response("<h1>Bienvenido al Analizador de Lotería</h1>")

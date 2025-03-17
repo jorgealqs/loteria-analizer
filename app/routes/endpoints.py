@@ -16,7 +16,7 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 
 # 📌 Función auxiliar para cargar datos con manejo de errores

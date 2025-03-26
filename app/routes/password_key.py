@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 router_password_key = APIRouter(
     prefix="/api/password-key",
-    tags=["password-key"],
+    tags=["Password Key"],
     responses={
         404: {"description": "Not found"},
         500: {"description": "Internal server error"}

@@ -8,8 +8,22 @@ from app.services.analisys import (
 )
 from app.services.grafic import graficBarras
 import logging
+import xmlrpc.client
+from dotenv import load_dotenv
+import os
 
-# 📌 Configurar logging
+
+# Cargo variables de mentor decide .env
+load_dotenv()
+
+# Obtener valores de las variables de entorno
+ODOO_URL = os.getenv("ODOO_URL")
+DB_NAME = os.getenv("DB_NAME")
+ODOO_USER = os.getenv("ODOO_USER")
+ODOO_PASSWORD = os.getenv("ODOO_PASSWORD")
+
+
+# 📌 Configure logging
 logging.basicConfig(
     filename="logs/app.log",
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -114,3 +128,61 @@ def grafico_barras(num: int = Query(ge=1, le=39)):
     buf = graficBarras(fechas_lista, str(num))
 
     return Response(content=buf.getvalue(), media_type="image/png")
+
+
+@router.get("/odoo/conectar")
+def conectar_odoo():
+
+    # Conectar con Odoo
+    common = xmlrpc.client.ServerProxy(f"{ODOO_URL}/xmlrpc/2/common")
+    user_id = common.authenticate(DB_NAME, ODOO_USER, ODOO_PASSWORD, {})
+
+    if not user_id:
+        logging.info("\n\nError en la autenticación\n\n")
+    else:
+        logging.info(f"\n\nUsuario autenticado con ID: {user_id}\n\n")
+
+        # Conectar con el modelo de Odoo
+        models = xmlrpc.client.ServerProxy(f"{ODOO_URL}/xmlrpc/2/object")
+
+        # Obtener todos los campos del modelo lottery.baloto
+        fields_lottery = models.execute_kw(
+            DB_NAME,
+            user_id,
+            ODOO_PASSWORD,
+            "lottery.baloto",
+            "fields_get",
+            [],
+            {"attributes": ["string", "type"]}
+        )
+
+        # Extraer los nombres de los campos
+        all_fields = list(fields_lottery.keys())
+
+        tipos_loteria = models.execute_kw(
+            DB_NAME,
+            user_id,
+            ODOO_PASSWORD,
+            "lottery.baloto.type",  # Modelo correcto donde está 'MiLoto'
+            "search_read",
+            [[["name", "=", "MiLoto"]]],
+            {"fields": ["id"]}
+        )
+
+        # Buscar información del usuario en res. Partner
+        partner_data = models.execute_kw(
+            DB_NAME,
+            user_id,
+            ODOO_PASSWORD,
+            "lottery.baloto",  # Modelo
+            "search_read",  # Método
+            [[["lottery_type_id", "=", tipos_loteria[0]["id"]]]],
+            # Sin filtros
+            {"fields": all_fields}  # Campos que queremos ver
+        )
+
+        if partner_data:
+            logging.info(f"\n\nDatos del usuario: {partner_data}\n\n")
+            return {"result": partner_data}
+        else:
+            logging.info("\n\nNo se encontró el usuario.\n\n")

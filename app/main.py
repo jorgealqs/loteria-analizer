@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Response
 from app.routes.endpoints import router
+from app.routes.password_key import router_password_key
 
 app = FastAPI(
     title="Analizador de Lotería",
@@ -8,6 +9,7 @@ app = FastAPI(
 )
 
 app.include_router(router)
+app.include_router(router_password_key)
 
 
 @app.get("/")

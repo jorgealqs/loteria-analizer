@@ -1,5 +1,9 @@
 FROM python:3.11-slim
 
+# Instala dependencias necesarias para Chrome y Chromedriver
+RUN apt-get update && apt-get install -y wget unzip curl \
+    chromium chromium-driver -y
+
 WORKDIR /app
 
 COPY requirements.txt /app/
